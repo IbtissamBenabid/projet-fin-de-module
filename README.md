@@ -7,9 +7,9 @@ Ce projet implémente un système d'identité numérique sécurisé basé sur la
 
 ### Méthodologie du Dataset (Cadre Académique)
 Pour simuler un environnement réaliste sans utiliser de données personnelles réelles, le projet utilise un **Mapping Multimodal Inter-Dataset** :
-*   **Visages** : Issus du dataset **Labeled Faces in the Wild (LFW)** ou **Georgia Tech Face Database**.
-*   **Empreintes** : Issues du dataset **FVC2002** ou **FVC2004**.
-*   **Lien** : Chaque individu du dataset A est arbitrairement mais systématiquement lié à un individu du dataset B pour créer une identité numérique multimodale unique (`Digital ID`).
+*   **Visages** : Issus de la **Yale Face Database** (15 sujets avec 11 variations chacun).
+*   **Empreintes** : Issues du dataset **NIST Special Database 4 (SD-4)**.
+*   **Lien** : Chaque sujet Yale est lié systématiquement à un sujet NIST (ex: Yale Subject 01 <-> NIST Subject f0001) pour créer une identité numérique multimodale cohérente.
 *   **Stockage** : Seuls les descripteurs (vecteurs) sont extraits et stockés, respectant la minimisation des données.
 
 ### Acteurs

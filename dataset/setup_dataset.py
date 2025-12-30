@@ -1,43 +1,48 @@
 import os
-import shutil
 import json
 
-# Configuration du dataset pour le projet académique
+# Configuration des sources académiques
+# Source 1: Yale Face Database (15 sujets)
+# Source 2: NIST Special Database 4 (Empreintes)
 DATASET_DIR = "dataset"
-RAW_DIR = os.path.join(DATASET_DIR, "raw")
-PAIRS_FILE = os.path.join(DATASET_DIR, "identity_pairs.json")
+PAIRS_FILE = os.path.join(DATASET_DIR, "yale_nist_mapping.json")
 
-def initialize_dataset():
+def setup_yale_nist_mapping():
     """
-    Initialise la structure du dataset.
-    Dans un cadre académique, on lie un ID de visage à un ID d'empreinte.
-    Exemple : 
-    - LFW Person X (Face) <-> FVC Person Y (Fingerprint)
+    Crée un mapping systématique entre Yale (Visages) et NIST (Empreintes).
+    Comme Yale a 15 sujets, nous lions les 15 premiers sujets NIST.
     """
-    if not os.path.exists(RAW_DIR):
-        os.makedirs(RAW_DIR)
+    if not os.path.exists(DATASET_DIR):
+        os.makedirs(DATASET_DIR)
+
+    mapping = []
     
-    # Structure de mapping (Simulée pour le projet)
-    # L'idée est qu'une identité numérique est la fusion de deux sources open-source
-    pairs = [
-        {
-            "identity_id": "STU-001",
-            "name": "Bénéficiaire Alpha",
-            "face_source": "lfw/Alice_0001.jpg",
-            "fingerprint_source": "fvc2002/DB1_1_1.tif"
-        },
-        {
-            "identity_id": "STU-002",
-            "name": "Bénéficiaire Beta",
-            "face_source": "lfw/Bob_0001.jpg",
-            "fingerprint_source": "fvc2002/DB1_2_1.tif"
-        }
-    ]
-    
-    with open(PAIRS_FILE, 'w') as f:
-        json.dump(pairs, f, indent=4)
+    # Yale subjects: 01 to 15
+    # NIST subjects: often numbered in sequence (f0001, f0002...)
+    for i in range(1, 16):
+        subject_id = f"{i:02d}"
         
-    print(f"Dataset initialisé. Mapping créé dans {PAIRS_FILE}")
+        # Mapping Multimodal Académique
+        entry = {
+            "digital_id": f"BT-YALE-NIST-{subject_id}",
+            "full_name": f"Subject Yale-{subject_id}",
+            "face_data": {
+                "dataset": "Yale Face Database",
+                "subject": f"subject{subject_id}",
+                "variations": ["normal", "happy", "sad", "sleepy", "wink"]
+            },
+            "fingerprint_data": {
+                "dataset": "NIST SD-4",
+                "subject_ref": f"f{i:04d}",
+                "fingers": ["index_right", "index_left"]
+            }
+        }
+        mapping.append(entry)
+
+    with open(PAIRS_FILE, 'w') as f:
+        json.dump(mapping, f, indent=4)
+        
+    print(f"Mapping Yale <-> NIST généré : {len(mapping)} identités créées.")
 
 if __name__ == "__main__":
-    initialize_dataset()
+    setup_yale_nist_mapping()

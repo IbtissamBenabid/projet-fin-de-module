@@ -1,35 +1,30 @@
 import os
 import json
-import base64
 
-DATASET_PATH = "dataset/identity_pairs.json"
+MAPPING_PATH = "dataset/yale_nist_mapping.json"
 
-class AcademicDataset:
+class AcademicDatasetLoader:
     """
-    Gestionnaire pour charger les données des datasets open-source (LFW, FVC, etc.)
+    Chargeur spécialisé pour Yale (Face) et NIST (Fingerprint).
+    Gère l'extraction des identités liées pour l'enrôlement et la vérification.
     """
     def __init__(self):
-        self.pairs = []
-        if os.path.exists(DATASET_PATH):
-            with open(DATASET_PATH, 'r') as f:
-                self.pairs = json.load(f)
+        self.identities = []
+        if os.path.exists(MAPPING_PATH):
+            with open(MAPPING_PATH, 'r') as f:
+                self.identities = json.load(f)
 
-    def get_all_identities(self):
-        return self.pairs
+    def get_list(self):
+        return [
+            {"id": ident["digital_id"], "name": ident["full_name"]} 
+            for ident in self.identities
+        ]
 
-    def get_identity_images(self, identity_id):
-        """
-        Retourne les images liées à une identité pour la simulation d'enrôlement.
-        """
-        for item in self.pairs:
-            if item['identity_id'] == identity_id:
-                # Dans un cas réel, on lirait les fichiers sur le disque
-                # Pour la démo, on simule le retour de contenu
-                return {
-                    "face_path": item['face_source'],
-                    "finger_path": item['fingerprint_source']
-                }
+    def get_details(self, digital_id):
+        for ident in self.identities:
+            if ident["digital_id"] == digital_id:
+                return ident
         return None
 
-# Singleton pour le chargement
-loader = AcademicDataset()
+# Singleton
+loader = AcademicDatasetLoader()

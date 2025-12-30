@@ -10,8 +10,9 @@ const App = () => {
     const [useDataset, setUseDataset] = useState(true);
 
     const datasetProfiles = [
-        { id: 'STU-001', name: 'Alice (LFW) + Finger 1 (FVC)', faceId: 'Alice_0001', fingerId: '1_1' },
-        { id: 'STU-002', name: 'Bob (LFW) + Finger 2 (FVC)', faceId: 'Bob_0001', fingerId: '2_1' },
+        { id: 'BT-YALE-NIST-01', name: 'Yale Sujet 01 + NIST f0001', face: 'Subject01', finger: 'f0001' },
+        { id: 'BT-YALE-NIST-02', name: 'Yale Sujet 02 + NIST f0002', face: 'Subject02', finger: 'f0002' },
+        { id: 'BT-YALE-NIST-03', name: 'Yale Sujet 03 + NIST f0003', face: 'Subject03', finger: 'f0003' },
     ];
 
     // Form State
@@ -230,7 +231,7 @@ const App = () => {
                         >
                             <div className="glass p-8 rounded-3xl">
                                 <h2 className="text-2xl font-bold mb-2">Métriques de Performance Biométrique</h2>
-                                <p className="text-text-muted mb-8">Validation scientifique basée sur les datasets LFW et FVC.</p>
+                                <p className="text-text-muted mb-8">Validation scientifique basée sur les datasets Yale Face et NIST SD-4.</p>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                     <div className="p-6 bg-white/5 rounded-2xl border border-white/5 text-center">
