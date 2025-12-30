@@ -6,14 +6,21 @@ import axios from 'axios';
 const App = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isProcessing, setIsProcessing] = useState(false);
-    const [enrollmentStatus, setEnrollmentStatus] = useState(null); // null, 'success', 'error'
+    const [enrollmentStatus, setEnrollmentStatus] = useState(null);
+    const [useDataset, setUseDataset] = useState(true);
+
+    const datasetProfiles = [
+        { id: 'STU-001', name: 'Alice (LFW) + Finger 1 (FVC)', faceId: 'Alice_0001', fingerId: '1_1' },
+        { id: 'STU-002', name: 'Bob (LFW) + Finger 2 (FVC)', faceId: 'Bob_0001', fingerId: '2_1' },
+    ];
 
     // Form State
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         faceImage: null,
-        fingerprintImage: null
+        fingerprintImage: null,
+        selectedProfile: ''
     });
 
     const handleEnrollment = async (e) => {
@@ -140,6 +147,39 @@ const App = () => {
                                 </div>
                             ) : (
                                 <form onSubmit={handleEnrollment} className="space-y-6">
+                                    <div className="bg-primary/10 p-4 rounded-xl border border-primary/20 mb-6 flex justify-between items-center">
+                                        <div>
+                                            <p className="text-sm font-bold text-primary">Mode Projet Académique</p>
+                                            <p className="text-[10px] text-text-muted">Utilisation de datasets open-source (LFW/FVC)</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setUseDataset(!useDataset)}
+                                            className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${useDataset ? 'bg-primary text-white' : 'bg-white/10'}`}
+                                        >
+                                            {useDataset ? "ACTIVÉ" : "DÉSACTIVÉ"}
+                                        </button>
+                                    </div>
+
+                                    {useDataset && (
+                                        <div className="mb-6">
+                                            <label className="block text-sm font-medium text-text-muted mb-2">Sélectionner un profil Dataset</label>
+                                            <select
+                                                className="w-full bg-white/5 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-primary text-text"
+                                                value={formData.selectedProfile}
+                                                onChange={(e) => {
+                                                    const p = datasetProfiles.find(x => x.id === e.target.value);
+                                                    setFormData({ ...formData, selectedProfile: e.target.value, firstName: p.id, lastName: 'Dataset Pair' });
+                                                }}
+                                            >
+                                                <option value="">-- Choisir un binôme (Visage + Empreinte) --</option>
+                                                {datasetProfiles.map(p => (
+                                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
                                     <div className="grid grid-cols-2 gap-4">
                                         <InputField label="Prénom" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} placeholder="Ex: Karim" />
                                         <InputField label="Nom" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} placeholder="Ex: Bennani" />

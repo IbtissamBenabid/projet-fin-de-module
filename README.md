@@ -5,6 +5,13 @@ Ce projet implémente un système d'identité numérique sécurisé basé sur la
 
 ## 2. Cas d’Usage : Accès Universel aux Services Publics (Universal Service Access)
 
+### Méthodologie du Dataset (Cadre Académique)
+Pour simuler un environnement réaliste sans utiliser de données personnelles réelles, le projet utilise un **Mapping Multimodal Inter-Dataset** :
+*   **Visages** : Issus du dataset **Labeled Faces in the Wild (LFW)** ou **Georgia Tech Face Database**.
+*   **Empreintes** : Issues du dataset **FVC2002** ou **FVC2004**.
+*   **Lien** : Chaque individu du dataset A est arbitrairement mais systématiquement lié à un individu du dataset B pour créer une identité numérique multimodale unique (`Digital ID`).
+*   **Stockage** : Seuls les descripteurs (vecteurs) sont extraits et stockés, respectant la minimisation des données.
+
 ### Acteurs
 *   **Bénéficiaire** : Personne sans identité officielle cherchant à accéder aux services.
 *   **Agent d'Enrôlement** : Officier autorisé à collecter les données biométriques.
