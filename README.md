@@ -40,8 +40,22 @@ Pour simuler un environnement réaliste sans utiliser de données personnelles r
 Le système repose sur une séparation stricte des responsabilités (SOC) :
 *   **Backend (Java/Spring Boot)** : Orchestration, Gestion des Identités, Sécurité (JWT), Audit Log.
 *   **Biometric Engine (Python/FastAPI)** : Extraction de caractéristiques via Deep Learning, Calcul de scores de similarité.
-*   **Database (PostgreSQL)** : Stockage des identités et des logs d'audit.
-*   **Frontend (React/Vite)** : Interface utilisateur moderne et sécurisée.
+*   **Database (PostgreSQL/H2)** : Stockage des identités et des logs d'audit.
+*   **Frontend (React/Vite)** : Interface utilisateur professionnelle de style gouvernemental avec design responsive.
+
+## 4.1 Interface Utilisateur - Design Gouvernemental
+L'interface frontend adopte un design professionnel inspiré des sites web gouvernementaux :
+*   **Couleurs officielles** : Bleu institutionnel (#1e40af), blanc, gris professionnels
+*   **Typographie** : Police Inter pour une lisibilité optimale
+*   **Layout responsive** : Adapté aux ordinateurs de bureau et appareils mobiles
+*   **Accessibilité** : Conformité aux standards WCAG pour l'inclusion
+*   **Sécurité visuelle** : Indicateurs de statut, badges de sécurité, icônes professionnelles
+
+### Fonctionnalités de l'Interface
+- **Tableau de Bord** : Vue d'ensemble avec statistiques en temps réel
+- **Enrôlement** : Formulaire sécurisé pour la création d'identités numériques
+- **Vérification** : Interface de validation d'identité avec capture biométrique
+- **Évaluation** : Tableaux de bord des métriques de performance système
 
 ## 5. Exigences de Sécurité Appliquées
 - [x] Séparation Données Brutes / Descripteurs.
@@ -50,7 +64,47 @@ Le système repose sur une séparation stricte des responsabilités (SOC) :
 - [x] Journalisation (Audit Trail) de chaque accès biométrique.
 - [x] RBAC (Role-Based Access Control).
 
-## 6. Métriques Biométriques (Cibles)
-*   **FAR (False Acceptance Rate)** : < 0.001%
-*   **FRR (False Rejection Rate)** : < 1%
-*   **EER (Equal Error Rate)** : Optimisé pour le compromis sécurité/confort utilisateur.
+## 7. Installation et Configuration
+
+### Prérequis
+*   **Java 17+** (Backend Spring Boot)
+*   **Python 3.8+** (Moteur biométrique)
+*   **Node.js 16+** (Frontend React)
+*   **Maven 3.6+** (Build Java)
+*   **Docker** (Optionnel pour le déploiement)
+
+### Démarrage Rapide
+```bash
+# 1. Cloner le repository
+git clone <repository-url>
+cd biotrust
+
+# 2. Démarrer les services avec Docker (recommandé)
+docker-compose up --build
+
+# Ou démarrage manuel:
+# Backend
+cd backend && mvn spring-boot:run
+
+# Biometric Engine (dans un autre terminal)
+cd biometric-service && uvicorn main:app --host 0.0.0.0 --port 8000
+
+# Frontend (dans un autre terminal)
+cd frontend && npm install && npm run dev
+```
+
+### Accès aux Services
+*   **Frontend** : http://localhost:3000
+*   **Backend API** : http://localhost:8081
+*   **Biometric Engine** : http://localhost:8000
+*   **Base de données H2** : http://localhost:8081/h2-console (dev seulement)
+
+## 8. Fichiers de Configuration
+
+### .gitignore
+Le projet inclut un fichier `.gitignore` complet couvrant :
+*   **Java** : `target/`, `*.class`, IDE files
+*   **Python** : `__pycache__/`, `*.pyc`, virtual environments
+*   **Node.js** : `node_modules/`, `dist/`, build artifacts
+*   **OS** : `.DS_Store`, `Thumbs.db`, temporary files
+*   **Application** : datasets bruts, logs, fichiers temporaires

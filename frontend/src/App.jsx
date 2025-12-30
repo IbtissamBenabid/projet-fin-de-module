@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Shield, Fingerprint, UserCheck, Activity, Users, Lock, Camera, CheckCircle2, AlertCircle, RefreshCcw } from 'lucide-react';
+import { Shield, Fingerprint, UserCheck, Activity, Users, Lock, Camera, CheckCircle2, AlertCircle, RefreshCcw, Building2, FileText, Award, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -56,47 +56,475 @@ const App = () => {
     };
 
     return (
-        <div className="min-h-screen p-8">
-            <div className="grid-bg"></div>
+        <div className="min-h-screen bg-gray-50">
+            {/* Government Header */}
+            <header className="bg-white border-b-4 border-blue-600 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center py-4">
+                        <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                    <Building2 className="w-7 h-7 text-white" />
+                                </div>
+                                <div>
+                                    <h1 className="text-2xl font-bold text-gray-900">Ministère de l'Identité Numérique</h1>
+                                    <p className="text-sm text-gray-600">Système National de Confiance Biométrique</p>
+                                </div>
+                            </div>
+                        </div>
 
-            <nav className="max-w-7xl mx-auto flex justify-between items-center mb-12 glass p-4 px-8">
-                <div className="flex items-center gap-2">
-                    <Shield className="text-primary w-8 h-8" />
-                    <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-                        BioTrust
-                    </span>
+                        <div className="flex items-center space-x-4">
+                            <div className="text-right">
+                                <p className="text-sm font-medium text-gray-900">Agent Enrôlement</p>
+                                <p className="text-xs text-gray-600">Ahmed_Security_Officer</p>
+                            </div>
+                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <Shield className="w-5 h-5 text-green-600" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="flex gap-6">
-                    {['dashboard', 'enrollment', 'verify', 'evaluation'].map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`capitalize font-medium transition-colors ${activeTab === tab ? 'text-primary' : 'text-text-muted hover:text-text'
-                                }`}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
+                {/* Navigation */}
+                <nav className="bg-blue-50 border-t border-blue-200">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex space-x-8 py-3">
+                            {[
+                                { id: 'dashboard', label: 'Tableau de Bord', icon: Activity },
+                                { id: 'enrollment', label: 'Enrôlement', icon: UserCheck },
+                                { id: 'verify', label: 'Vérification', icon: Fingerprint },
+                                { id: 'evaluation', label: 'Évaluation', icon: Award }
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                        activeTab === tab.id
+                                            ? 'bg-blue-600 text-white'
+                                            : 'text-blue-700 hover:bg-blue-100'
+                                    }`}
+                                >
+                                    <tab.icon className="w-4 h-4" />
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </nav>
+            </header>
 
-                <button className="btn-primary flex items-center gap-2">
-                    <Lock size={18} />
-                    Agent : Ahmed_Sec
-                </button>
-            </nav>
-
-            <main className="max-w-7xl mx-auto">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <AnimatePresence mode="wait">
                     {activeTab === 'dashboard' && (
                         <motion.div
                             key="dashboard"
-                            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
                         >
-                            <StatCard icon={<Users />} title="Identités Gérées" value="1,284" trend="+12% / mois" />
-                            <StatCard icon={<Fingerprint />} title="Taux de Précision" value="99.98%" trend="EER: 0.02%" />
-                            <StatCard icon={<Activity />} title="Santé du Système" value="Optimal" trend="12ms Latence" />
+                            {/* Welcome Section */}
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Bienvenue dans BioTrust</h2>
+                                        <p className="text-gray-600">Système de confiance numérique biométrique pour l'accès universel aux services publics</p>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <Globe className="w-8 h-8 text-blue-600" />
+                                        <span className="text-sm font-medium text-gray-600">Système Sécurisé</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <StatCard
+                                    icon={<Users className="w-8 h-8 text-blue-600" />}
+                                    title="Identités Gérées"
+                                    value="1,284"
+                                    subtitle="Citoyens enregistrés"
+                                    trend="+12% ce mois"
+                                    color="blue"
+                                />
+                                <StatCard
+                                    icon={<Fingerprint className="w-8 h-8 text-green-600" />}
+                                    title="Précision Système"
+                                    value="99.98%"
+                                    subtitle="Taux de reconnaissance"
+                                    trend="EER: 0.02%"
+                                    color="green"
+                                />
+                                <StatCard
+                                    icon={<Activity className="w-8 h-8 text-purple-600" />}
+                                    title="Performance"
+                                    value="12ms"
+                                    subtitle="Temps de réponse moyen"
+                                    trend="Optimal"
+                                    color="purple"
+                                />
+                                <StatCard
+                                    icon={<Shield className="w-8 h-8 text-indigo-600" />}
+                                    title="Sécurité"
+                                    value="Niveau 4"
+                                    subtitle="Classification de sécurité"
+                                    trend="Conforme RGPD"
+                                    color="indigo"
+                                />
+                            </div>
+
+                            {/* Recent Activity */}
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                    <FileText className="w-5 h-5 mr-2 text-gray-600" />
+                                    Activité Récente
+                                </h3>
+                                <div className="space-y-4">
+                                    {[
+                                        { action: 'Enrôlement', user: 'Marie Dupont', time: '2 minutes', status: 'success' },
+                                        { action: 'Vérification', user: 'Jean Martin', time: '5 minutes', status: 'success' },
+                                        { action: 'Enrôlement', user: 'Sophie Bernard', time: '12 minutes', status: 'success' },
+                                        { action: 'Vérification', user: 'Pierre Dubois', time: '18 minutes', status: 'failed' }
+                                    ].map((activity, index) => (
+                                        <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                                            <div className="flex items-center space-x-3">
+                                                <div className={`w-2 h-2 rounded-full ${activity.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900">{activity.action} - {activity.user}</p>
+                                                    <p className="text-xs text-gray-500">il y a {activity.time}</p>
+                                                </div>
+                                            </div>
+                                            <span className={`px-2 py-1 text-xs rounded-full ${
+                                                activity.status === 'success'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
+                                            }`}>
+                                                {activity.status === 'success' ? 'Réussi' : 'Échec'}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'enrollment' && (
+                        <motion.div
+                            key="enrollment"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="max-w-4xl mx-auto"
+                        >
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                                <div className="text-center mb-8">
+                                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <UserCheck className="w-8 h-8 text-blue-600" />
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Enrôlement Biométrique</h2>
+                                    <p className="text-gray-600">Création d'une identité numérique sécurisée</p>
+                                </div>
+
+                                <form onSubmit={handleEnrollment} className="space-y-6">
+                                    {/* Personal Information */}
+                                    <div className="bg-gray-50 rounded-lg p-6">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Informations Personnelles</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    value={formData.firstName}
+                                                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    value={formData.lastName}
+                                                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Biometric Capture */}
+                                    <div className="bg-gray-50 rounded-lg p-6">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Capture Biométrique</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="text-center">
+                                                <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center mb-4 border-2 border-dashed border-gray-300">
+                                                    <div className="text-center">
+                                                        <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                                                        <p className="text-sm text-gray-600">Photo du visage</p>
+                                                        <p className="text-xs text-gray-500 mt-1">Cliquez pour capturer</p>
+                                                    </div>
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={(e) => setFormData({...formData, faceImage: e.target.files[0]})}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                                                >
+                                                    Capturer Visage
+                                                </button>
+                                            </div>
+
+                                            <div className="text-center">
+                                                <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center mb-4 border-2 border-dashed border-gray-300">
+                                                    <div className="text-center">
+                                                        <Fingerprint className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                                                        <p className="text-sm text-gray-600">Empreinte digitale</p>
+                                                        <p className="text-xs text-gray-500 mt-1">Cliquez pour capturer</p>
+                                                    </div>
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={(e) => setFormData({...formData, fingerprintImage: e.target.files[0]})}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                                                >
+                                                    Capturer Empreinte
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Dataset Option */}
+                                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h4 className="text-sm font-medium text-yellow-800">Mode Démonstration</h4>
+                                                <p className="text-sm text-yellow-700">Utiliser les données académiques pour les tests</p>
+                                            </div>
+                                            <label className="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={useDataset}
+                                                    onChange={(e) => setUseDataset(e.target.checked)}
+                                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <span className="ml-2 text-sm text-yellow-700">Activer</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    {/* Submit Button */}
+                                    <div className="flex justify-center">
+                                        <button
+                                            type="submit"
+                                            disabled={isProcessing}
+                                            className="bg-blue-600 text-white px-8 py-3 rounded-md font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                                        >
+                                            {isProcessing ? (
+                                                <>
+                                                    <RefreshCcw className="w-5 h-5 animate-spin" />
+                                                    <span>Traitement en cours...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Shield className="w-5 h-5" />
+                                                    <span>Créer l'Identité Numérique</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </form>
+
+                                {/* Status Messages */}
+                                {enrollmentStatus === 'success' && (
+                                    <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                                        <div className="flex items-center">
+                                            <CheckCircle2 className="w-5 h-5 text-green-600 mr-2" />
+                                            <span className="text-green-800 font-medium">Enrôlement réussi !</span>
+                                        </div>
+                                        <p className="text-green-700 text-sm mt-1">L'identité numérique a été créée avec succès.</p>
+                                    </div>
+                                )}
+
+                                {enrollmentStatus === 'error' && (
+                                    <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                                        <div className="flex items-center">
+                                            <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+                                            <span className="text-red-800 font-medium">Erreur d'enrôlement</span>
+                                        </div>
+                                        <p className="text-red-700 text-sm mt-1">Une erreur s'est produite lors de la création de l'identité.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'verify' && (
+                        <motion.div
+                            key="verify"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="max-w-2xl mx-auto"
+                        >
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                                <div className="text-center mb-8">
+                                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Fingerprint className="w-8 h-8 text-green-600" />
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Vérification d'Identité</h2>
+                                    <p className="text-gray-600">Vérifiez une identité existante</p>
+                                </div>
+
+                                <form className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">ID Numérique</label>
+                                        <input
+                                            type="text"
+                                            placeholder="REF-XXXXXXXX"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                    </div>
+
+                                    <div className="text-center">
+                                        <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center mb-4 border-2 border-dashed border-gray-300">
+                                            <div className="text-center">
+                                                <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                                                <p className="text-sm text-gray-600">Capture du visage</p>
+                                                <p className="text-xs text-gray-500 mt-1">Pour vérification</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+                                        >
+                                            Capturer et Vérifier
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'evaluation' && (
+                        <motion.div
+                            key="evaluation"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                        >
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                                <div className="text-center mb-8">
+                                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Award className="w-8 h-8 text-purple-600" />
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Évaluation du Système</h2>
+                                    <p className="text-gray-600">Métriques de performance biométrique</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="text-center p-6 bg-blue-50 rounded-lg">
+                                        <div className="text-3xl font-bold text-blue-600 mb-2">99.98%</div>
+                                        <div className="text-sm text-blue-700">Taux de Reconnaissance</div>
+                                    </div>
+                                    <div className="text-center p-6 bg-green-50 rounded-lg">
+                                        <div className="text-3xl font-bold text-green-600 mb-2">0.02%</div>
+                                        <div className="text-sm text-green-700">Taux d'Erreur (EER)</div>
+                                    </div>
+                                    <div className="text-center p-6 bg-purple-50 rounded-lg">
+                                        <div className="text-3xl font-bold text-purple-600 mb-2">12ms</div>
+                                        <div className="text-sm text-purple-700">Latence Moyenne</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </main>
+
+            {/* Footer */}
+            <footer className="bg-gray-900 text-white mt-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        <div>
+                            <div className="flex items-center space-x-2 mb-4">
+                                <Building2 className="w-6 h-6" />
+                                <span className="font-bold">BioTrust</span>
+                            </div>
+                            <p className="text-gray-400 text-sm">
+                                Système national de confiance numérique biométrique pour l'accès universel aux services publics.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold mb-4">Conformité</h3>
+                            <ul className="space-y-2 text-sm text-gray-400">
+                                <li>• RGPD Compliant</li>
+                                <li>• Loi 08.09 Respect</li>
+                                <li>• Sécurité Niveau 4</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold mb-4">Technologies</h3>
+                            <ul className="space-y-2 text-sm text-gray-400">
+                                <li>• IA & Deep Learning</li>
+                                <li>• Chiffrement AES-256</li>
+                                <li>• Multimodal Biometrics</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold mb-4">Support</h3>
+                            <ul className="space-y-2 text-sm text-gray-400">
+                                <li>• Documentation</li>
+                                <li>• Support Technique</li>
+                                <li>• Formation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+                        <p>&copy; 2025 Ministère de l'Identité Numérique. Tous droits réservés.</p>
+                        <p className="mt-2">Système développé pour la sécurité et l'inclusion sociale.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
+};
+
+// StatCard Component
+const StatCard = ({ icon, title, value, subtitle, trend, color }) => {
+    const colorClasses = {
+        blue: 'border-blue-200 bg-blue-50',
+        green: 'border-green-200 bg-green-50',
+        purple: 'border-purple-200 bg-purple-50',
+        indigo: 'border-indigo-200 bg-indigo-50'
+    };
+
+    return (
+        <div className={`rounded-lg border p-6 ${colorClasses[color] || 'border-gray-200 bg-white'}`}>
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="text-sm font-medium text-gray-600">{title}</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+                    {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+                    {trend && <p className="text-xs text-green-600 mt-1 font-medium">{trend}</p>}
+                </div>
+                <div className="opacity-80">
+                    {icon}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default App;
 
                             <div className="md:col-span-2 glass card p-8">
                                 <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
@@ -278,72 +706,91 @@ const App = () => {
     );
 };
 
-const StatCard = ({ icon, title, value, trend }) => (
-    <div className="glass card p-6">
+const StatCard = ({ icon, title, value, trend, color = 'primary' }) => (
+    <div className="card">
         <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-white/5 rounded-2xl text-primary">{icon}</div>
-            <span className="text-xs font-bold text-success px-2 py-1 bg-success/10 rounded-full">{trend}</span>
+            <div className={`p-3 bg-${color}/10 rounded-lg text-${color}`}>{icon}</div>
+            <span className={`text-xs font-semibold px-2 py-1 bg-${color}/10 text-${color} rounded-full`}>{trend}</span>
         </div>
         <h4 className="text-text-muted text-sm font-medium">{title}</h4>
-        <p className="text-3xl font-bold mt-1">{value}</p>
+        <p className="text-2xl font-bold mt-1">{value}</p>
     </div>
 );
 
 const LogEntry = ({ status, action, details, time }) => (
-    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+    <div className="flex items-center justify-between p-4 bg-surface rounded-lg border border-border">
         <div className="flex items-center gap-4">
-            <div className={`p-2 rounded-lg ${status === 'success' ? 'bg-success/20 text-success' : 'bg-primary/20 text-primary'}`}>
-                {status === 'success' ? <CheckCircle2 size={18} /> : <Activity size={18} />}
+            <div className={`p-2 rounded-lg ${
+                status === 'success' ? 'bg-success/20 text-success' :
+                status === 'error' ? 'bg-error/20 text-error' :
+                'bg-primary/20 text-primary'
+            }`}>
+                {status === 'success' ? <CheckCircle2 size={18} /> :
+                 status === 'error' ? <AlertCircle size={18} /> :
+                 <Activity size={18} />}
             </div>
             <div>
                 <p className="font-semibold text-sm">{action}</p>
                 <p className="text-xs text-text-muted">{details}</p>
             </div>
         </div>
-        <span className="text-[10px] text-text-muted font-mono">{time}</span>
+        <span className="text-xs text-text-muted font-mono">{time}</span>
     </div>
 );
 
 const InputField = ({ label, value, onChange, placeholder }) => (
-    <div>
-        <label className="block text-sm font-medium text-text-muted mb-2">{label}</label>
+    <div className="input-field">
+        <label>{label}</label>
         <input
             required
             type="text"
             value={value}
             onChange={onChange}
-            className="w-full bg-white/5 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-primary transition-all text-text"
             placeholder={placeholder}
         />
     </div>
 );
 
 const MetricRow = ({ label, value, desc, color }) => (
-    <div className="p-4 bg-white/5 rounded-xl border border-white/5 flex justify-between items-center">
+    <div className="p-4 bg-surface rounded-lg border border-border flex justify-between items-center">
         <div>
-            <p className="font-bold text-sm">{label}</p>
+            <p className="font-semibold text-sm">{label}</p>
             <p className="text-xs text-text-muted">{desc}</p>
         </div>
-        <div className={`text-xl font-bold text-${color}`}>{value}</div>
+        <div className={`text-lg font-bold text-${color}`}>{value}</div>
     </div>
 );
 
-const CaptureBlock = ({ icon, title, desc, onCapture, captured, color = 'primary' }) => (
-    <div className={`p-6 border-2 border-dashed ${captured ? 'border-success/50 bg-success/5' : 'border-white/10'} rounded-2xl flex items-center justify-between hover:border-${color}/50 transition-all`}>
+const ComplianceItem = ({ status, text }) => (
+    <div className="flex items-center gap-3 p-3 bg-surface rounded-lg">
+        <div className={`w-3 h-3 rounded-full ${
+            status === 'success' ? 'bg-success' :
+            status === 'warning' ? 'bg-warning' :
+            'bg-error'
+        }`}></div>
+        <span className="text-sm">{text}</span>
+    </div>
+);
+
+const CaptureBlock = ({ icon, title, desc, onCapture, captured }) => (
+    <div className={`p-6 border-2 border-dashed rounded-lg flex items-center justify-between hover:border-primary transition-all ${
+        captured ? 'border-success bg-success/5' : 'border-border'
+    }`}>
         <div className="flex items-center gap-4">
-            <div className={`p-3 bg-${color}/10 rounded-full text-${color}`}>{icon}</div>
+            <div className={`p-3 bg-primary/10 rounded-full text-primary`}>{icon}</div>
             <div>
-                <p className="font-bold">{title}</p>
+                <p className="font-semibold">{title}</p>
                 <p className="text-xs text-text-muted">{desc}</p>
             </div>
         </div>
         <button
             type="button"
             onClick={onCapture}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${captured ? 'bg-success text-white' : 'bg-white/10 text-text hover:bg-white/20'
-                }`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                captured ? 'bg-success text-white' : 'bg-surface text-text hover:bg-surface-dark'
+            }`}
         >
-            {captured ? "Capturé ✓" : "Démarrer"}
+            {captured ? "✓ Capturé" : "Démarrer"}
         </button>
     </div>
 );
