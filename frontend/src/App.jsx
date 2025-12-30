@@ -1,15 +1,56 @@
-import React, { useState } from 'react';
-import { Shield, Fingerprint, UserCheck, Activity, Users, Lock, ChevronRight, Camera } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Shield, Fingerprint, UserCheck, Activity, Users, Lock, Camera, CheckCircle2, AlertCircle, RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 const App = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [enrollmentStatus, setEnrollmentStatus] = useState(null); // null, 'success', 'error'
+
+    // Form State
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        faceImage: null,
+        fingerprintImage: null
+    });
+
+    const handleEnrollment = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+        setEnrollmentStatus(null);
+
+        try {
+            // Simulation de capture si non fournie (pour la démo)
+            const faceBase64 = formData.faceImage || "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+            const fingerBase64 = formData.fingerprintImage || "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+
+            const response = await axios.post('/api/biometrics/enroll', {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                faceImageBase64: faceBase64,
+                fingerprintImageBase64: fingerBase64
+            });
+
+            console.log("Enrôlement réussi:", response.data);
+            setEnrollmentStatus('success');
+            setTimeout(() => {
+                setActiveTab('dashboard');
+                setEnrollmentStatus(null);
+            }, 3000);
+        } catch (error) {
+            console.error("Erreur d'enrôlement:", error);
+            setEnrollmentStatus('error');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <div className="min-h-screen p-8">
             <div className="grid-bg"></div>
 
-            {/* Navigation */}
             <nav className="max-w-7xl mx-auto flex justify-between items-center mb-12 glass p-4 px-8">
                 <div className="flex items-center gap-2">
                     <Shield className="text-primary w-8 h-8" />
@@ -33,7 +74,7 @@ const App = () => {
 
                 <button className="btn-primary flex items-center gap-2">
                     <Lock size={18} />
-                    Session Sécurisée
+                    Agent : Ahmed_Sec
                 </button>
             </nav>
 
@@ -42,38 +83,34 @@ const App = () => {
                     {activeTab === 'dashboard' && (
                         <motion.div
                             key="dashboard"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
+                            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
                             className="grid grid-cols-1 md:grid-cols-3 gap-8"
                         >
-                            <StatCard icon={<Users />} title="Total Enrôlés" value="1,284" trend="+12% ce mois" />
-                            <StatCard icon={<UserCheck />} title="Vérifications Réussies" value="99.8%" trend="FAR: 0.001%" />
-                            <StatCard icon={<Activity />} title="Alertes Sécurité" value="0" trend="Système Stable" />
+                            <StatCard icon={<Users />} title="Identités Gérées" value="1,284" trend="+12% / mois" />
+                            <StatCard icon={<Fingerprint />} title="Taux de Précision" value="99.98%" trend="EER: 0.02%" />
+                            <StatCard icon={<Activity />} title="Santé du Système" value="Optimal" trend="12ms Latence" />
 
                             <div className="md:col-span-2 glass card p-8">
-                                <h3 className="text-xl font-bold mb-6">Activités Récentes</h3>
+                                <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                    <Activity className="text-primary" /> Journal de Traitement Temps-Réel
+                                </h3>
                                 <div className="space-y-4">
-                                    {[1, 2, 3].map((i) => (
-                                        <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
-                                            <div className="flex items-center gap-4">
-                                                <div className="p-2 bg-primary/20 rounded-lg"><UserCheck size={20} className="text-primary" /></div>
-                                                <div>
-                                                    <p className="font-semibold">Vérification de l'ID #REF-782{i}</p>
-                                                    <p className="text-sm text-text-muted">Centre : Casablanca Anfa | 14:2{i}</p>
-                                                </div>
-                                            </div>
-                                            <span className="text-success font-bold">MATCH 99%</span>
-                                        </div>
-                                    ))}
+                                    <LogEntry status="success" action="Extraction Faciale" details="Vecteur 128-d généré (Conf: 0.98)" time="Il y a 2 min" />
+                                    <LogEntry status="success" action="Chiffrement AES" details="Descripteur sécurisé en base de données" time="Il y a 5 min" />
+                                    <LogEntry status="info" action="Audit Access" details="Agent Ahmed_Sec a consulté l'ID #REF-9921" time="Il y a 10 min" />
                                 </div>
                             </div>
 
                             <div className="glass card p-8 flex flex-col justify-center items-center text-center">
-                                <Fingerprint size={64} className="text-secondary mb-4 animate-pulse-slow" />
-                                <h3 className="text-xl font-bold mb-2">Scanner Prêt</h3>
-                                <p className="text-text-muted mb-6">En attente d'une entrée biométrique pour l'identification rapide.</p>
-                                <button className="w-full btn-primary">Lancer le Scan</button>
+                                <div className="p-6 bg-primary/10 rounded-full mb-6 relative">
+                                    <RefreshCcw size={48} className="text-primary animate-spin-slow" />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Fingerprint size={24} className="text-primary" />
+                                    </div>
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">Collecte de Données</h3>
+                                <p className="text-text-muted mb-6">Prêt pour le prochain enrôlement multimodal sécurisé.</p>
+                                <button onClick={() => setActiveTab('enrollment')} className="w-full btn-primary">Démarrer Collecte</button>
                             </div>
                         </motion.div>
                     )}
@@ -81,47 +118,68 @@ const App = () => {
                     {activeTab === 'enrollment' && (
                         <motion.div
                             key="enrollment"
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
+                            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                             className="max-w-2xl mx-auto glass card p-8"
                         >
-                            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                                <Camera className="text-primary" /> Nouvel Enrôlement Biométrique
-                            </h2>
-                            <form className="space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-text-muted mb-2">Prénom</label>
-                                        <input type="text" className="w-full bg-white/5 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-primary" placeholder="Jean" />
+                            <div className="flex justify-between items-start mb-8">
+                                <div>
+                                    <h2 className="text-2xl font-bold">Collecte & Traitement</h2>
+                                    <p className="text-text-muted">Enregistrement d'un nouveau bénéficiaire</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <div className={`w-3 h-3 rounded-full ${isProcessing ? 'bg-accent animate-pulse' : 'bg-gray-600'}`}></div>
+                                    <div className={`w-3 h-3 rounded-full ${enrollmentStatus === 'success' ? 'bg-success' : 'bg-gray-600'}`}></div>
+                                </div>
+                            </div>
+
+                            {enrollmentStatus === 'success' ? (
+                                <div className="text-center py-12">
+                                    <CheckCircle2 size={80} className="text-success mx-auto mb-4" />
+                                    <h3 className="text-2xl font-bold mb-2">Enrôlement Réussi</h3>
+                                    <p className="text-text-muted">Digital ID généré et descripteurs chiffrés stockés.</p>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleEnrollment} className="space-y-6">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <InputField label="Prénom" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} placeholder="Ex: Karim" />
+                                        <InputField label="Nom" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} placeholder="Ex: Bennani" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-text-muted mb-2">Nom</label>
-                                        <input type="text" className="w-full bg-white/5 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-primary" placeholder="Dupont" />
+
+                                    <CaptureBlock
+                                        icon={<Camera />}
+                                        title="Capture Visage"
+                                        desc="Détection de vivacité et extraction de traits"
+                                        onCapture={() => setFormData({ ...formData, faceImage: "SIMULATED_BASE64_FACE" })}
+                                        captured={!!formData.faceImage}
+                                    />
+
+                                    <CaptureBlock
+                                        icon={<Fingerprint />}
+                                        title="Scan Empreinte"
+                                        desc="Binarisation et extraction de minuties"
+                                        onCapture={() => setFormData({ ...formData, fingerprintImage: "SIMULATED_BASE64_FINGER" })}
+                                        captured={!!formData.fingerprintImage}
+                                        color="secondary"
+                                    />
+
+                                    <div className="bg-white/5 p-4 rounded-xl border border-white/10 text-xs text-text-muted leading-relaxed">
+                                        <p className="font-bold mb-1 text-primary">TRAITEMENT SÉCURISÉ :</p>
+                                        Les images brutes sont traitées en mémoire tampon et supprimées immédiatement après génération des descripteurs mathématiques chiffrés via AES-256. Conformité Loi 08.09.
                                     </div>
-                                </div>
 
-                                <div className="p-8 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center gap-4 hover:border-primary/50 transition-colors">
-                                    <div className="p-4 bg-primary/10 rounded-full"><Camera className="text-primary" size={32} /></div>
-                                    <p className="text-text-muted">Prendre une photo du visage (Vérification de vivacité auto-activée)</p>
-                                    <button type="button" className="btn-primary">Activer Caméra</button>
-                                </div>
-
-                                <div className="p-8 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center gap-4 hover:border-secondary/50 transition-colors">
-                                    <div className="p-4 bg-secondary/10 rounded-full"><Fingerprint className="text-secondary" size={32} /></div>
-                                    <p className="text-text-muted">Scanner l'empreinte digitale (Index Droit)</p>
-                                    <button type="button" className="btn-primary" style={{ background: 'var(--secondary)' }}>Initialiser Scanner</button>
-                                </div>
-
-                                <div className="flex items-start gap-3">
-                                    <input type="checkbox" id="consent" className="mt-1" />
-                                    <label htmlFor="consent" className="text-xs text-text-muted">
-                                        Je consens au traitement de mes données biométriques conformément à la Loi 08.09. Les données brutes seront supprimées après extraction des descripteurs chiffrés.
-                                    </label>
-                                </div>
-
-                                <button type="submit" className="w-full btn-primary py-4 text-lg">Finaliser l'Enrôlement et Générer le Digital ID</button>
-                            </form>
+                                    <button
+                                        type="submit"
+                                        disabled={isProcessing}
+                                        className="w-full btn-primary py-4 text-lg flex items-center justify-center gap-2"
+                                    >
+                                        {isProcessing ? (
+                                            <><RefreshCcw className="animate-spin" /> Traitement en cours...</>
+                                        ) : (
+                                            "Générer l'Identité Numérique"
+                                        )}
+                                    </button>
+                                </form>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -138,6 +196,55 @@ const StatCard = ({ icon, title, value, trend }) => (
         </div>
         <h4 className="text-text-muted text-sm font-medium">{title}</h4>
         <p className="text-3xl font-bold mt-1">{value}</p>
+    </div>
+);
+
+const LogEntry = ({ status, action, details, time }) => (
+    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+        <div className="flex items-center gap-4">
+            <div className={`p-2 rounded-lg ${status === 'success' ? 'bg-success/20 text-success' : 'bg-primary/20 text-primary'}`}>
+                {status === 'success' ? <CheckCircle2 size={18} /> : <Activity size={18} />}
+            </div>
+            <div>
+                <p className="font-semibold text-sm">{action}</p>
+                <p className="text-xs text-text-muted">{details}</p>
+            </div>
+        </div>
+        <span className="text-[10px] text-text-muted font-mono">{time}</span>
+    </div>
+);
+
+const InputField = ({ label, value, onChange, placeholder }) => (
+    <div>
+        <label className="block text-sm font-medium text-text-muted mb-2">{label}</label>
+        <input
+            required
+            type="text"
+            value={value}
+            onChange={onChange}
+            className="w-full bg-white/5 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-primary transition-all text-text"
+            placeholder={placeholder}
+        />
+    </div>
+);
+
+const CaptureBlock = ({ icon, title, desc, onCapture, captured, color = 'primary' }) => (
+    <div className={`p-6 border-2 border-dashed ${captured ? 'border-success/50 bg-success/5' : 'border-white/10'} rounded-2xl flex items-center justify-between hover:border-${color}/50 transition-all`}>
+        <div className="flex items-center gap-4">
+            <div className={`p-3 bg-${color}/10 rounded-full text-${color}`}>{icon}</div>
+            <div>
+                <p className="font-bold">{title}</p>
+                <p className="text-xs text-text-muted">{desc}</p>
+            </div>
+        </div>
+        <button
+            type="button"
+            onClick={onCapture}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${captured ? 'bg-success text-white' : 'bg-white/10 text-text hover:bg-white/20'
+                }`}
+        >
+            {captured ? "Capturé ✓" : "Démarrer"}
+        </button>
     </div>
 );
 
