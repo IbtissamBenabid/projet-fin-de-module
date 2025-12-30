@@ -244,6 +244,16 @@ input:focus, textarea:focus, select:focus {
   animation: spin 1s linear infinite;
 }
 
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .government-header {
@@ -298,10 +308,6 @@ select:focus-visible {
     box-shadow: none;
     border: 1px solid #ccc;
   }
-}
-  background-size: 20px 20px;
-  opacity: 0.3;
-  z-index: -1;
 }
 
 h1, h2, h3, h4, h5, h6 {

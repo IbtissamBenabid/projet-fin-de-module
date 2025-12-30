@@ -3,6 +3,49 @@ import { Shield, Fingerprint, UserCheck, Activity, Users, Lock, Camera, CheckCir
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
+// LogEntry Component
+const LogEntry = ({ status, action, details, time }) => {
+    const statusColors = {
+        success: 'text-green-600 bg-green-100',
+        error: 'text-red-600 bg-red-100',
+        info: 'text-blue-600 bg-blue-100',
+        warning: 'text-yellow-600 bg-yellow-100'
+    };
+
+    return (
+        <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+            <div className={`w-2 h-2 rounded-full mt-2 ${status === 'success' ? 'bg-green-500' : status === 'error' ? 'bg-red-500' : 'bg-blue-500'}`}></div>
+            <div className="flex-1">
+                <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-900">{action}</p>
+                    <span className="text-xs text-gray-500">{time}</span>
+                </div>
+                <p className="text-xs text-gray-600 mt-1">{details}</p>
+            </div>
+        </div>
+    );
+};
+
+// MetricRow Component
+const MetricRow = ({ label, value, desc, color }) => {
+    const colorClasses = {
+        error: 'text-red-600',
+        primary: 'text-blue-600',
+        success: 'text-green-600',
+        warning: 'text-yellow-600'
+    };
+
+    return (
+        <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex justify-between items-center">
+            <div>
+                <p className="font-semibold text-sm">{label}</p>
+                <p className="text-xs text-text-muted">{desc}</p>
+            </div>
+            <div className={`text-lg font-bold ${colorClasses[color] || 'text-gray-600'}`}>{value}</div>
+        </div>
+    );
+};
+
 const App = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isProcessing, setIsProcessing] = useState(false);
@@ -172,50 +215,69 @@ const App = () => {
                                 />
                             </div>
 
-                            {/* Recent Activity */}
+                            {/* Additional Dashboard Cards */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                                {/* Recent Activity - spans 2 columns on large screens */}
+                                <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                        <FileText className="w-5 h-5 mr-2 text-gray-600" />
+                                        Activité Récente
+                                    </h3>
+                                    <div className="space-y-4">
+                                        {[
+                                            { action: 'Enrôlement', user: 'Marie Dupont', time: '2 minutes', status: 'success' },
+                                            { action: 'Vérification', user: 'Jean Martin', time: '5 minutes', status: 'success' },
+                                            { action: 'Enrôlement', user: 'Sophie Bernard', time: '12 minutes', status: 'success' },
+                                            { action: 'Vérification', user: 'Pierre Dubois', time: '18 minutes', status: 'failed' }
+                                        ].map((activity, index) => (
+                                            <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className={`w-2 h-2 rounded-full ${activity.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">{activity.action} - {activity.user}</p>
+                                                        <p className="text-xs text-gray-500">il y a {activity.time}</p>
+                                                    </div>
+                                                </div>
+                                                <span className={`px-2 py-1 text-xs rounded-full ${
+                                                    activity.status === 'success'
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-red-100 text-red-800'
+                                                }`}>
+                                                    {activity.status === 'success' ? 'Réussi' : 'Échec'}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="glass card p-8 flex flex-col justify-center items-center text-center">
+                                    <div className="p-6 bg-primary/10 rounded-full mb-6 relative">
+                                        <RefreshCcw size={48} className="text-primary animate-spin-slow" />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <Fingerprint size={24} className="text-primary" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2">Collecte de Données</h3>
+                                    <p className="text-text-muted mb-6">Prêt pour le prochain enrôlement multimodal sécurisé.</p>
+                                    <button onClick={() => setActiveTab('enrollment')} className="w-full btn-primary">Démarrer Collecte</button>
+                                </div>
+                            </div>
+
+                            {/* Real-time Processing Log */}
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                    <FileText className="w-5 h-5 mr-2 text-gray-600" />
-                                    Activité Récente
+                                <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                    <Activity className="text-primary" /> Journal de Traitement Temps-Réel
                                 </h3>
                                 <div className="space-y-4">
-                                    {[
-                                        { action: 'Enrôlement', user: 'Marie Dupont', time: '2 minutes', status: 'success' },
-                                        { action: 'Vérification', user: 'Jean Martin', time: '5 minutes', status: 'success' },
-                                        { action: 'Enrôlement', user: 'Sophie Bernard', time: '12 minutes', status: 'success' },
-                                        { action: 'Vérification', user: 'Pierre Dubois', time: '18 minutes', status: 'failed' }
-                                    ].map((activity, index) => (
-                                        <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
-                                            <div className="flex items-center space-x-3">
-                                                <div className={`w-2 h-2 rounded-full ${activity.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                                <div>
-                                                    <p className="text-sm font-medium text-gray-900">{activity.action} - {activity.user}</p>
-                                                    <p className="text-xs text-gray-500">il y a {activity.time}</p>
-                                                </div>
-                                            </div>
-                                            <span className={`px-2 py-1 text-xs rounded-full ${
-                                                activity.status === 'success'
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : 'bg-red-100 text-red-800'
-                                            }`}>
-                                                {activity.status === 'success' ? 'Réussi' : 'Échec'}
-                                            </span>
-                                        </div>
-                                    ))}
+                                    <LogEntry status="success" action="Extraction Faciale" details="Vecteur 128-d généré (Conf: 0.98)" time="Il y a 2 min" />
+                                    <LogEntry status="success" action="Chiffrement AES" details="Descripteur sécurisé en base de données" time="Il y a 5 min" />
+                                    <LogEntry status="info" action="Audit Access" details="Agent Ahmed_Sec a consulté l'ID #REF-9921" time="Il y a 10 min" />
                                 </div>
                             </div>
                         </motion.div>
                     )}
 
-                    {activeTab === 'enrollment' && (
-                        <motion.div
-                            key="enrollment"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="max-w-4xl mx-auto"
-                        >
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                    {activeTab === 'verify' && (
                                 <div className="text-center mb-8">
                                     <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <UserCheck className="w-8 h-8 text-blue-600" />
@@ -523,35 +585,6 @@ const StatCard = ({ icon, title, value, subtitle, trend, color }) => {
         </div>
     );
 };
-
-export default App;
-
-                            <div className="md:col-span-2 glass card p-8">
-                                <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                                    <Activity className="text-primary" /> Journal de Traitement Temps-Réel
-                                </h3>
-                                <div className="space-y-4">
-                                    <LogEntry status="success" action="Extraction Faciale" details="Vecteur 128-d généré (Conf: 0.98)" time="Il y a 2 min" />
-                                    <LogEntry status="success" action="Chiffrement AES" details="Descripteur sécurisé en base de données" time="Il y a 5 min" />
-                                    <LogEntry status="info" action="Audit Access" details="Agent Ahmed_Sec a consulté l'ID #REF-9921" time="Il y a 10 min" />
-                                </div>
-                            </div>
-
-                            <div className="glass card p-8 flex flex-col justify-center items-center text-center">
-                                <div className="p-6 bg-primary/10 rounded-full mb-6 relative">
-                                    <RefreshCcw size={48} className="text-primary animate-spin-slow" />
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Fingerprint size={24} className="text-primary" />
-                                    </div>
-                                </div>
-                                <h3 className="text-xl font-bold mb-2">Collecte de Données</h3>
-                                <p className="text-text-muted mb-6">Prêt pour le prochain enrôlement multimodal sécurisé.</p>
-                                <button onClick={() => setActiveTab('enrollment')} className="w-full btn-primary">Démarrer Collecte</button>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {activeTab === 'enrollment' && (
                         <motion.div
                             key="enrollment"
                             initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
@@ -705,94 +738,5 @@ export default App;
         </div>
     );
 };
-
-const StatCard = ({ icon, title, value, trend, color = 'primary' }) => (
-    <div className="card">
-        <div className="flex justify-between items-start mb-4">
-            <div className={`p-3 bg-${color}/10 rounded-lg text-${color}`}>{icon}</div>
-            <span className={`text-xs font-semibold px-2 py-1 bg-${color}/10 text-${color} rounded-full`}>{trend}</span>
-        </div>
-        <h4 className="text-text-muted text-sm font-medium">{title}</h4>
-        <p className="text-2xl font-bold mt-1">{value}</p>
-    </div>
-);
-
-const LogEntry = ({ status, action, details, time }) => (
-    <div className="flex items-center justify-between p-4 bg-surface rounded-lg border border-border">
-        <div className="flex items-center gap-4">
-            <div className={`p-2 rounded-lg ${
-                status === 'success' ? 'bg-success/20 text-success' :
-                status === 'error' ? 'bg-error/20 text-error' :
-                'bg-primary/20 text-primary'
-            }`}>
-                {status === 'success' ? <CheckCircle2 size={18} /> :
-                 status === 'error' ? <AlertCircle size={18} /> :
-                 <Activity size={18} />}
-            </div>
-            <div>
-                <p className="font-semibold text-sm">{action}</p>
-                <p className="text-xs text-text-muted">{details}</p>
-            </div>
-        </div>
-        <span className="text-xs text-text-muted font-mono">{time}</span>
-    </div>
-);
-
-const InputField = ({ label, value, onChange, placeholder }) => (
-    <div className="input-field">
-        <label>{label}</label>
-        <input
-            required
-            type="text"
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
-        />
-    </div>
-);
-
-const MetricRow = ({ label, value, desc, color }) => (
-    <div className="p-4 bg-surface rounded-lg border border-border flex justify-between items-center">
-        <div>
-            <p className="font-semibold text-sm">{label}</p>
-            <p className="text-xs text-text-muted">{desc}</p>
-        </div>
-        <div className={`text-lg font-bold text-${color}`}>{value}</div>
-    </div>
-);
-
-const ComplianceItem = ({ status, text }) => (
-    <div className="flex items-center gap-3 p-3 bg-surface rounded-lg">
-        <div className={`w-3 h-3 rounded-full ${
-            status === 'success' ? 'bg-success' :
-            status === 'warning' ? 'bg-warning' :
-            'bg-error'
-        }`}></div>
-        <span className="text-sm">{text}</span>
-    </div>
-);
-
-const CaptureBlock = ({ icon, title, desc, onCapture, captured }) => (
-    <div className={`p-6 border-2 border-dashed rounded-lg flex items-center justify-between hover:border-primary transition-all ${
-        captured ? 'border-success bg-success/5' : 'border-border'
-    }`}>
-        <div className="flex items-center gap-4">
-            <div className={`p-3 bg-primary/10 rounded-full text-primary`}>{icon}</div>
-            <div>
-                <p className="font-semibold">{title}</p>
-                <p className="text-xs text-text-muted">{desc}</p>
-            </div>
-        </div>
-        <button
-            type="button"
-            onClick={onCapture}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                captured ? 'bg-success text-white' : 'bg-surface text-text hover:bg-surface-dark'
-            }`}
-        >
-            {captured ? "✓ Capturé" : "Démarrer"}
-        </button>
-    </div>
-);
 
 export default App;
