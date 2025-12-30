@@ -7,6 +7,7 @@ import base64
 from cryptography.fernet import Fernet
 import os
 import logging
+from evaluator import BiometricEvaluator
 
 # Configuration du logging pour la traçabilité (Exigence 5)
 logging.basicConfig(level=logging.INFO)
@@ -152,6 +153,18 @@ async def process_verification(
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail="Échec de la vérification")
+
+@app.get("/evaluate")
+async def evaluate_system():
+    """
+    Simule une campagne d'évaluation biométrique sur le dataset.
+    Calcule FAR, FRR et EER pour validation académique.
+    """
+    thresholds = np.linspace(0, 1, 100)
+    genuine, impostor = BiometricEvaluator.generate_simulated_scores(n_samples=500)
+    results = BiometricEvaluator.calculate_metrics(genuine, impostor, thresholds)
+    
+    return results
 
 if __name__ == "__main__":
     import uvicorn
