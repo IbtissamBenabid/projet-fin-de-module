@@ -15,7 +15,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll() // En prod, on utiliserait JWT
+                        .requestMatchers("/api/**", "/h2-console/**").permitAll() // En prod, on utiliserait JWT
                         .anyRequest().authenticated());
         return http.build();
     }
