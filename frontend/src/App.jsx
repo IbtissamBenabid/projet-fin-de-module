@@ -94,19 +94,22 @@ const App = () => {
 
     const handleEnrollment = async (e) => {
         e.preventDefault();
-        setIsProcessing(true);
         setEnrollmentStatus(null);
 
-        try {
-            // Simulation de capture si non fournie (pour la démo)
-            const faceBase64 = formData.faceImage || "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
-            const fingerBase64 = formData.fingerprintImage || "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+        // Validation côté frontend (mode production) : on exige de vraies captures
+        if (!formData.faceImage || !formData.fingerprintImage) {
+            setEnrollmentStatus('missing-images');
+            return;
+        }
 
+        setIsProcessing(true);
+
+        try {
             const response = await axios.post('/api/biometrics/enroll', {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
-                faceImageBase64: faceBase64,
-                fingerprintImageBase64: fingerBase64
+                faceImageBase64: formData.faceImage,
+                fingerprintImageBase64: formData.fingerprintImage
             });
 
             console.log("Enrôlement réussi:", response.data);
@@ -117,7 +120,11 @@ const App = () => {
             }, 3000);
         } catch (error) {
             console.error("Erreur d'enrôlement:", error);
-            setEnrollmentStatus('error');
+            if (error.response && error.response.data && error.response.data.detail === 'Aucun visage détecté') {
+                setEnrollmentStatus('no-face');
+            } else {
+                setEnrollmentStatus('error');
+            }
         } finally {
             setIsProcessing(false);
         }
@@ -181,7 +188,7 @@ const App = () => {
                 </nav>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
                 <AnimatePresence mode="wait">
                     {activeTab === 'dashboard' && (
                         <motion.div
@@ -189,36 +196,34 @@ const App = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
-                            className="space-y-8 md:space-y-12"
+                            className="space-y-8 md:space-y-10"
                         >
-                            {/* Welcome Section */}
-                            <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl md:rounded-3xl shadow-xl p-6 md:p-10 text-white">
-                                <div className="relative z-10 max-w-3xl">
-                                    <h2 className="text-2xl md:text-4xl font-black mb-3 md:mb-4 tracking-tight">Bienvenue dans BioTrust</h2>
-                                    <p className="text-blue-100 text-base md:text-xl leading-relaxed">
-                                        Système national de confiance numérique biométrique. 
-                                        Gérez les identités avec une précision et une sécurité de niveau gouvernemental.
+                            {/* Intro + quick actions */}
+                            <div className="bg-white border border-gray-200 rounded-2xl md:rounded-3xl shadow-sm p-5 md:p-7 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                                <div>
+                                    <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Bienvenue dans BioTrust</h2>
+                                    <p className="text-sm md:text-base text-gray-600 max-w-2xl">
+                                        Gérez les enrôlements et vérifications biométriques des citoyens dans un environnement simple, clair et sécurisé.
                                     </p>
-                                    <div className="mt-6 md:mt-10 flex flex-col sm:flex-row gap-4 md:gap-6">
-                                        <button 
-                                            onClick={() => setActiveTab('enrollment')}
-                                            className="w-full sm:w-auto bg-white text-blue-600 px-8 py-3 md:py-3.5 rounded-xl md:rounded-2xl font-bold hover:bg-blue-50 transition-all shadow-lg"
-                                        >
-                                            Nouvel Enrôlement
-                                        </button>
-                                        <button 
-                                            onClick={() => setActiveTab('verify')}
-                                            className="w-full sm:w-auto bg-blue-500/20 backdrop-blur-md text-white px-8 py-3 md:py-3.5 rounded-xl md:rounded-2xl font-bold hover:bg-blue-500/30 transition-all border border-white/30"
-                                        >
-                                            Vérifier une Identité
-                                        </button>
-                                    </div>
                                 </div>
-                                <Globe className="absolute right-[-60px] bottom-[-60px] md:right-[-40px] md:bottom-[-40px] w-64 h-64 md:w-80 md:h-80 text-white/10" />
+                                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                    <button
+                                        onClick={() => setActiveTab('enrollment')}
+                                        className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                                    >
+                                        Nouvel enrôlement
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('verify')}
+                                        className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                                    >
+                                        Vérifier une identité
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Stats Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                                 <StatCard
                                     icon={<Users className="w-8 h-8 text-blue-600" />}
                                     title="Identités Gérées"
@@ -734,43 +739,29 @@ const App = () => {
     );
 };
 
-// StatCard Component
+// StatCard Component (simplified, calmer look)
 const StatCard = ({ icon, title, value, subtitle, trend, color }) => {
-    const colorClasses = {
-        blue: 'border-blue-100 bg-gradient-to-br from-white to-blue-50/50 text-blue-700',
-        green: 'border-green-100 bg-gradient-to-br from-white to-green-50/50 text-green-700',
-        purple: 'border-purple-100 bg-gradient-to-br from-white to-purple-50/50 text-purple-700',
-        indigo: 'border-indigo-100 bg-gradient-to-br from-white to-indigo-50/50 text-indigo-700'
-    };
-
-    const iconBg = {
-        blue: 'bg-blue-100',
-        green: 'bg-green-100',
-        purple: 'bg-purple-100',
-        indigo: 'bg-indigo-100'
+    const borderColors = {
+        blue: 'border-l-blue-500',
+        green: 'border-l-green-500',
+        purple: 'border-l-purple-500',
+        indigo: 'border-l-indigo-500'
     };
 
     return (
-        <motion.div 
-            whileHover={{ y: -5 }}
-            className={`rounded-2xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg ${colorClasses[color] || 'border-gray-200 bg-white'}`}
+        <div
+            className={`flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 md:px-5 md:py-4 shadow-sm ${
+                borderColors[color] || 'border-l-gray-200'
+            } border-l-4`}
         >
-            <div className="flex items-start justify-between">
-                <div>
-                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">{title}</p>
-                    <p className="text-3xl font-black text-gray-900 mt-2">{value}</p>
-                    {subtitle && <p className="text-xs text-gray-500 mt-1 font-medium">{subtitle}</p>}
-                    {trend && (
-                        <div className="flex items-center mt-3 space-x-1">
-                            <span className="text-xs font-bold px-2 py-0.5 bg-green-100 text-green-700 rounded-full">{trend}</span>
-                        </div>
-                    )}
-                </div>
-                <div className={`p-3 rounded-xl ${iconBg[color] || 'bg-gray-100'}`}>
-                    {icon}
-                </div>
+            <div className="space-y-0.5">
+                <p className="text-xs md:text-sm font-medium text-gray-500">{title}</p>
+                <p className="text-xl md:text-2xl font-semibold text-gray-900">{value}</p>
+                {subtitle && <p className="text-[11px] md:text-xs text-gray-500">{subtitle}</p>}
+                {trend && <p className="text-[11px] md:text-xs text-green-600 font-medium">{trend}</p>}
             </div>
-        </motion.div>
+            <div className="ml-4 flex-shrink-0 text-gray-400">{icon}</div>
+        </div>
     );
 };
 
